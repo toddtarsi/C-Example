@@ -29,13 +29,6 @@ int readInt(std::string variable) {
 namespace superformula {
   const float a = 1.0;
   const float b = 1.0;
-  float point(float m, float n1, float n2, float n3, float theta) {
-   	float a_val(fabs(cos(m * theta / 4.0) / a));
-   	float b_val(fabs(sin(m * theta / 4.0) / b));
-   	float ab_val(pow(a_val, n2) + pow(b_val, n3));
-   	float f_val(pow(ab_val, n1));
-   	return f_val;
-  }
   class PointCloud{
     private:
    	  float m;
@@ -44,6 +37,13 @@ namespace superformula {
    	  float n3;
       int size;
       std::vector<float> points;
+      float point(float m, float n1, float n2, float n3, float theta) {
+       	float a_val(fabs(cos(m * theta / 4.0) / a));
+       	float b_val(fabs(sin(m * theta / 4.0) / b));
+       	float ab_val(pow(a_val, n2) + pow(b_val, n3));
+       	float f_val(pow(ab_val, n1));
+       	return f_val;
+      }
     public:
       PointCloud(int m_, int n1_, int n2_, int n3_){
         m = float(m_);
@@ -56,7 +56,7 @@ namespace superformula {
        	float priv_n1(-1.0 / n1);
         writeLine("m " + std::to_string(m) +" n1 " + std::to_string(n1) +" n2 " + std::to_string(n2) +" n3 " + std::to_string(n3));
        	for (int i = 0; i != size; i++) {
-       	  points.push_back(superformula::point(m, priv_n1, n2, n3, i * STEP_SIZE));
+       	  points.push_back(point(m, priv_n1, n2, n3, i * STEP_SIZE));
        	}
       }
       void read_points() {
