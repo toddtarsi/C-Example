@@ -32,11 +32,8 @@ namespace superformula {
   float point(float m, float n1, float n2, float n3, float theta) {
    	float a_val(fabs(cos(m * theta / 4.0) / a));
    	float b_val(fabs(sin(m * theta / 4.0) / b));
-    writeLine("cos " + std::to_string(cos(m * theta / 4.0)));
-    writeLine("sin " + std::to_string(sin(m * theta / 4.0)));
    	float ab_val(pow(a_val, n2) + pow(b_val, n3));
    	float f_val(pow(ab_val, n1));
-    writeLine("a " + std::to_string(a_val) +" b " + std::to_string(b_val) +" ab " + std::to_string(ab_val) +" f " + std::to_string(f_val));
    	return f_val;
   }
   class PointCloud{
