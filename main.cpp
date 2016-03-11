@@ -31,10 +31,10 @@ namespace superformula {
   const float b = 1.0;
   class PointCloud{
     private:
-   	  float m;
-   	  float n1;
-   	  float n2;
-   	  float n3;
+      float m;
+      float n1;
+      float n2;
+      float n3;
       int size;
       std::vector<float> points;
       float point(float m, float n1, float n2, float n3, float theta) {
