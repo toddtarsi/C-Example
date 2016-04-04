@@ -3,9 +3,13 @@
 #include <string>
 #include <math.h>
 #include <vector>
+#include <GL/gl.h>
+#include <GL/glut.h>
+#include <GL/glu.h>
 
 #define PI 3.1415
-#define STEP_COUNT 32
+#define HALF_PI PI/2.0
+#define STEP_COUNT 1024.0
 #define STEP_SIZE PI/STEP_COUNT
 
 void writeLine(std::string lit_str) {
@@ -31,10 +35,10 @@ namespace superformula {
   const float b = 1.0;
   class PointCloud{
     private:
-   	  float m;
-   	  float n1;
-   	  float n2;
-   	  float n3;
+      float m;
+      float n1;
+      float n2;
+      float n3;
       int size;
       std::vector<float> points;
       float point(float m, float n1, float n2, float n3, float theta) {
@@ -52,37 +56,71 @@ namespace superformula {
         n3 = float(n3_);
         size = int(m * STEP_COUNT);
       }
-      void assign_points() {
+      void assign() {
        	float priv_n1(-1.0 / n1);
+        float max_point = 0;
         writeLine("m " + std::to_string(m) +" n1 " + std::to_string(n1) +" n2 " + std::to_string(n2) +" n3 " + std::to_string(n3));
        	for (int i = 0; i != size; i++) {
-       	  points.push_back(point(m, priv_n1, n2, n3, i * STEP_SIZE));
+       	  float r = point(m, priv_n1, n2, n3, i * STEP_SIZE - HALF_PI);
+          max_point = std::max(max_point, r);
+          points.push_back(r);
+       	}
+       	for (int i = 0; i != size; i++) {
+       	  points[i] /= max_point;
        	}
       }
-      void read_points() {
+      void read() {
         for (int i = 0; i != size; i++) {
           writeLine("THETA : " + std::to_string(i * STEP_SIZE) + " VAL: " + std::to_string(points[i]));
         }
       }
+      void draw() {
+        glBegin(GL_LINE_STRIP);
+        for (int i = 0; i != size; i++) {
+          float point = points[i];
+          float theta = i * STEP_SIZE - HALF_PI;
+          float x = cos(theta) * point;
+          float y = sin(theta) * point;
+          glVertex3f(x, y, 0.0f);  // V0
+        }
+        glEnd();
+      }
   };
 }
+superformula::PointCloud default_point_cloud(1,1,1,1);
+superformula::PointCloud &point_cloud = default_point_cloud;
 
+void Setup() { 
+  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+}
+void Display() {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glColor3f(0.7f, 0.6f, 0.0f);
+  point_cloud.draw();
+  glutSwapBuffers();
+}
 
-int main() {
+int main(int argc, char *argv[]) {
   writeLine("The superformula is a generalization of the superellipse that takes four variables: m, n1, n2, n3");
   writeLine("By varying these inputs, we can generate many of the shapes seen in nature");
-  writeLine("This program takes four inputs and returns a 36 point cloud representing the custom shape points");
+  writeLine("This pro'gram takes four inputs and returns a 36 point cloud representing the custom shape points");
   writeLine("More advanced implementations may go so far as to take these inputs and generate 3d meshes");
   writeLine("However, that's a bit much for doing during my vacation :P");
   int m = readInt("m");
   int n1 = readInt("n1");
   int n2 = readInt("n2");
   int n3 = readInt("n3");
-  superformula::PointCloud input (m, n1, n2, n3);
   writeLine("Generating points:");
-  input.assign_points();
-  input.read_points();
-  writeLine("Thank you. Press Enter to exit.");
-  std::string fin;
-  std::getline(std::cin, fin);
+  superformula::PointCloud input (m, n1, n2, n3);
+  input.assign();
+  point_cloud = input;
+  writeLine("Loading your superformula shape!");
+  glutInit(&argc, argv);
+  glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+  glutInitWindowSize(800,600);
+  glutCreateWindow("2D SuperFormula Implementation");
+  glutDisplayFunc(Display);
+  glutMainLoop();
+
+  return 0;
 }
